@@ -1,0 +1,8 @@
+---
+description: "API endpoint conventions"
+globs:
+  - "src/api/**"
+alwaysApply: false
+---
+
+Use REST conventions. Return proper status codes.

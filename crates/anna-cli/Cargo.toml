@@ -1,0 +1,20 @@
+[package]
+name = "anna-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "command-line entrypoint for anna"
+
+[[bin]]
+name = "anna"
+path = "src/main.rs"
+
+[dependencies]
+anna-ir = { workspace = true }
+anna-adapters = { workspace = true }
+anna-core = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+serde_json = { workspace = true }

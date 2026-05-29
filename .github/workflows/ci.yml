@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            use-zigbuild: true
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            use-zigbuild: true
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            use-zigbuild: false
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            use-zigbuild: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install cargo-zigbuild
+        if: ${{ matrix.use-zigbuild }}
+        run: pip install ziglang && cargo install cargo-zigbuild
+      - name: Build
+        run: |
+          if [ "${{ matrix.use-zigbuild }}" = "true" ]; then
+            cargo zigbuild --workspace --target ${{ matrix.target }}
+          else
+            cargo build --workspace --target ${{ matrix.target }}
+          fi
+      - name: Test
+        if: ${{ !contains(matrix.target, 'aarch64') }}
+        run: |
+          if [ "${{ matrix.use-zigbuild }}" = "true" ]; then
+            cargo zigbuild --workspace --target ${{ matrix.target }} --tests
+            cargo test --workspace --target ${{ matrix.target }}
+          else
+            cargo test --workspace --target ${{ matrix.target }}
+          fi

@@ -1,0 +1,19 @@
+{
+  // MCP server configuration
+  "mcp": {
+    "local-server": {
+      "type": "local",
+      "command": ["npx", "-y", "my-mcp-server"],
+      "environment": {
+        "TOKEN": "abc123"
+      }
+    },
+    /* Remote server for external API */
+    "remote-server": {
+      "type": "remote",
+      "url": "https://example.com/mcp",
+      "command": ["unused"],
+      "environment": {}
+    }
+  }
+}

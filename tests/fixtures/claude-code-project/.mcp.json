@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "stdio-server": {
+      "command": "npx",
+      "args": ["-y", "@example/mcp-server"],
+      "env": { "TOKEN": "abc" }
+    },
+    "http-server": {
+      "url": "http://127.0.0.1:9800/mcp"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+---
+description: "Core project standards"
+alwaysApply: true
+---
+
+Be concise. Use TypeScript. Write tests.

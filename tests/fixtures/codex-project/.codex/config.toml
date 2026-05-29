@@ -1,0 +1,13 @@
+model = "o3"
+approval_mode = "suggest"
+
+[mcp_servers.stdio-server]
+command = "npx"
+args = ["-y", "@example/mcp-server"]
+enabled = true
+
+[mcp_servers.stdio-server.env]
+TOKEN = "abc"
+
+[mcp_servers.http-server]
+url = "http://127.0.0.1:9800/mcp"
