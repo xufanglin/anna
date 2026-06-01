@@ -26,6 +26,9 @@ jobs:
           - os: macos-latest
             target: aarch64-apple-darwin
             use-zigbuild: false
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            use-zigbuild: false
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +39,7 @@ jobs:
         if: ${{ matrix.use-zigbuild }}
         run: pip install ziglang && cargo install cargo-zigbuild
       - name: Build
+        shell: bash
         run: |
           if [ "${{ matrix.use-zigbuild }}" = "true" ]; then
             cargo zigbuild --workspace --target ${{ matrix.target }}
@@ -44,6 +48,7 @@ jobs:
           fi
       - name: Test
         if: ${{ !contains(matrix.target, 'aarch64') }}
+        shell: bash
         run: |
           if [ "${{ matrix.use-zigbuild }}" = "true" ]; then
             cargo zigbuild --workspace --target ${{ matrix.target }} --tests

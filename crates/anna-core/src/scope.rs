@@ -29,7 +29,14 @@ pub fn default_global_root(agent_id: &str) -> Option<PathBuf> {
     match agent_id {
         "kiro" => Some(home.join(".kiro")),
         "copilot-cli" => Some(home.join(".copilot")),
-        "opencode" => Some(home.join(".config").join("opencode")),
+        "opencode" => {
+            if cfg!(windows) {
+                // Windows: %LOCALAPPDATA%\opencode
+                dirs::data_local_dir().map(|d| d.join("opencode"))
+            } else {
+                Some(home.join(".config").join("opencode"))
+            }
+        }
         "codex" => Some(home.join(".codex")),
         "claude-code" => Some(home.join(".claude")),
         "cursor" => Some(home.join(".cursor")),
