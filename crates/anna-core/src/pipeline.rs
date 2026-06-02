@@ -1,7 +1,9 @@
 //! 转换 pipeline 与交互式确认 helper。
 
 use std::io::IsTerminal;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+use anna_ir::{Ir, McpTransport};
 
 use crate::adapter::{AdapterError, AdapterResult, Reader, WritePlan, Writer};
 use crate::lossy::{LossyEntry, render_report};
@@ -41,7 +43,8 @@ pub fn run_pipeline(
     dst_scope: Scope,
     opts: PipelineOptions,
 ) -> AdapterResult<PipelineOutcome> {
-    let (ir, mut lossy) = reader.read(src, src_scope)?;
+    let (mut ir, mut lossy) = reader.read(src, src_scope)?;
+    expand_relative_paths(&mut ir, src);
     let mut plan = writer.plan(&ir, dst, dst_scope)?;
     lossy.append(&mut plan.lossy);
     plan.lossy = lossy;
@@ -174,4 +177,42 @@ fn prompt_user(lossy: &[LossyEntry]) -> AdapterResult<ConfirmDecision> {
             }
         }
     }
+}
+
+/// Expand relative paths (`./`, `../`) and tilde paths (`~/`) in MCP server
+/// commands to absolute paths. Relative paths resolve against the source root;
+/// tilde paths resolve against the user's home directory.
+fn expand_relative_paths(ir: &mut Ir, src_root: &Path) {
+    let home = dirs::home_dir();
+    for srv in &mut ir.mcp_servers {
+        if let McpTransport::Stdio { command, .. } = &mut srv.transport {
+            if command.starts_with("./") || command.starts_with("../") {
+                let resolved = src_root.join(&*command);
+                if let Ok(abs) = resolved.canonicalize() {
+                    *command = abs.to_string_lossy().into_owned();
+                } else {
+                    *command = normalize_path(&resolved);
+                }
+            } else if command.starts_with("~/") {
+                if let Some(ref h) = home {
+                    let resolved = h.join(&command[2..]);
+                    *command = resolved.to_string_lossy().into_owned();
+                }
+            }
+        }
+    }
+}
+
+/// Normalize a path by resolving `.` and `..` components without requiring the path to exist.
+fn normalize_path(path: &Path) -> String {
+    let mut components = Vec::new();
+    for comp in path.components() {
+        match comp {
+            std::path::Component::ParentDir => { components.pop(); }
+            std::path::Component::CurDir => {}
+            other => components.push(other),
+        }
+    }
+    let result: PathBuf = components.iter().collect();
+    result.to_string_lossy().into_owned()
 }
