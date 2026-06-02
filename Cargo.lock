@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "anna-adapters"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "anna-core",
  "anna-ir",
@@ -21,7 +21,7 @@ dependencies = [
 
 [[package]]
 name = "anna-cli"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "anna-adapters",
  "anna-core",
@@ -33,7 +33,7 @@ dependencies = [
 
 [[package]]
 name = "anna-core"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "anna-ir",
  "dialoguer",
@@ -44,7 +44,7 @@ dependencies = [
 
 [[package]]
 name = "anna-ir"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "serde",
  "serde_json",
